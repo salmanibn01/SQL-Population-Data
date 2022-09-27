@@ -1,0 +1,148 @@
+-- Analyzing the Indian Data with SQL
+
+- checking the datasets
+
+SELECT * FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table`
+
+SELECT*  FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_table_2 ` 
+
+-- number of rows in the datasets
+
+-- dataset 1
+SELECT 
+count(*)
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table`
+
+-- dataset 2
+SELECT
+Count(*)
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_table_2` 
+
+-- data from Jharkhand and Bihar state from dataset 1
+
+SELECT *
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table`
+WHERE State in ('Jharkhand','Bihar')
+
+-- population of India 
+SELECT
+SUM (population) as Population
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_table_2 ` 
+
+-- average population growth
+SELECT 
+AVG (Growth)*100 AS Avg_Growth
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table` 
+
+-- average population growth by state
+SELECT State,
+AVG (Growth) as Avg_Growth
+ FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table`
+ GROUP BY State 
+ 
+
+-- Average sex ratio
+SELECT State,
+ROUND (AVG (Sex_Ratio),0) as Avg_sex_ratio
+ FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table`
+ GROUP BY State 
+ORDER BY Avg_sex_ratio DESC 
+
+-- Avearage literacy rate
+SELECT State,
+ROUND (AVG (Literacy),0) as Avg_literacy_rate
+ FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table`
+ GROUP BY State 
+ ORDER BY Avg_literacy_rate DESC 
+ 
+-- Average literacy rate > 90%
+SELECT State,
+ROUND (AVG (Literacy),0) as Avg_literacy_rate
+ FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table`
+ GROUP BY State 
+ HAVING ROUND (AVG (Literacy),0)>90 
+ ORDER BY Avg_literacy_rate DESC  
+
+-- top 3 states in terms of population growth
+SELECT State,
+Avg (Growth)*100 as Avg_growth_rate
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table`
+ GROUP BY State 
+ ORDER BY Avg_growth_rate DESC
+LIMIT 3
+
+-- Bottom 3 states in terms of average sex ratio
+SELECT State,
+Avg (Growth)*100 as Avg_growth_rate
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table`
+ GROUP BY State 
+ ORDER BY Avg_growth_rate ASC
+ LIMIT 3
+
+-- top 3 states in terms of average sex ratio
+SELECT State,
+ round(AVG(Sex_Ratio),0) as Avg_Sex_ratio
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table`
+ GROUP BY State 
+ ORDER BY Avg_Sex_ratio DESC
+ LIMIT 3
+ 
+-- Bottom 3 states in terms of average sex ratio
+SELECT State,
+ round(AVG(Sex_Ratio),0) as Avg_Sex_ratio
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table`
+ GROUP BY State 
+ ORDER BY Avg_Sex_ratio ASC
+ LIMIT 3
+
+## temporary tables
+-- top states accroding to literacy rate using temporary table
+
+WITH topstates AS
+(SELECT State, ROUND(AVG(Literacy),0) AS Avg_literacy_rate
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table`
+GROUP BY State
+ORDER BY Avg_literacy_rate DESC)
+SELECT*
+FROM topstates
+
+-- bottom states accoridng to literacy rate using temporary table
+WITH bottomstates AS
+(SELECT State, ROUND(AVG(Literacy),0) AS Avg_literacy_rate
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table`
+GROUP BY State
+ORDER BY Avg_literacy_rate ASC)
+SELECT*
+FROM bottomstates
+
+-- filtering state data sstarting with letter 'A' and 'B' 
+select *
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table`
+where state like 'B%' or state like 'B%'
+
+-- Joining the tables
+
+SELECT Indian_Census_Table.District,Indian_Census_Table.State, Indian_Census_Table.sex_ratio, Indian_Census_Table_2.Population 
+
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table` AS Indian_Census_Table 
+
+INNER JOIN `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table_2` as Indian_Census_Table_2
+
+ON Indian_Census_Table.District = Indian_Census_Table_2.District
+
+-- male and female data by district
+
+SELECT State, SUM (Males*1000) as Total_males, Sum(Females*1000) as Total_females
+
+FROM ((SELECT 	District, State, round (population/(sex_ratio+1),0) as males, round((population*(sex_ratio))/(sex_ratio+1),0) as females
+
+FROM (SELECT Indian_Census_Table.District,Indian_Census_Table.State, Indian_Census_Table.sex_ratio, Indian_Census_Table_2.Population 
+
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table` AS Indian_Census_Table 
+
+INNER JOIN `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table_2` as Indian_Census_Table_2
+
+ON Indian_Census_Table.District = Indian_Census_Table_2.District) as new_table)) 
+Group By state
+
+
