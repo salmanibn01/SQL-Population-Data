@@ -145,4 +145,50 @@ INNER JOIN `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table_2` as
 ON Indian_Census_Table.District = Indian_Census_Table_2.District) as new_table)) 
 Group By state
 
+-- literacy ratio
+
+SELECT State, sum(Literate_People), Sum(Illiterate_people)
+FROM 
+((SELECT district, state,round ((Literacy_ratio*Population),0) as Literate_People,
+Round((1-Literacy_ratio),0)*Population as Illiterate_people 
+
+FROM ((SELECT Indian_Census_Table.District,Indian_Census_Table.State, Indian_Census_Table.Literacy as Literacy_ratio, Indian_Census_Table_2.Population 
+
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table` AS Indian_Census_Table 
+
+INNER JOIN `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table_2` as Indian_Census_Table_2
+
+ON Indian_Census_Table.District = Indian_Census_Table_2.District))))
+GROUP BY state
+
+-- Population in previous census
+
+SELECT state, sum (Current_Census_Population), sum(Previous_Census_Population)
+FROM
+
+ (SELECT district, state, population/(1+Growth) as Previous_Census_Population, Population as Current_Census_Population
+FROM ((SELECT Indian_Census_Table.District,Indian_Census_Table.State, Indian_Census_Table.Growth, Indian_Census_Table_2.Population 
+
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table` AS Indian_Census_Table 
+
+INNER JOIN `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table_2` as Indian_Census_Table_2
+
+ON Indian_Census_Table.District = Indian_Census_Table_2.District)))
+GROUP BY State
+
+--Population per km2
+
+SELECT state, (Population/Area_km2) as Population_per_km2
+
+FROM
+
+(SELECT Indian_Census_Table.District,Indian_Census_Table.State, Indian_Census_Table_2.Population, Indian_Census_Table_2.Area_km2 
+
+FROM `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table` AS Indian_Census_Table 
+
+INNER JOIN `sql-portfolio-project-363421.Indian_Census.Indian_Census_Table_2` as Indian_Census_Table_2
+
+ON Indian_Census_Table.District = Indian_Census_Table_2.District)
+
+
 
