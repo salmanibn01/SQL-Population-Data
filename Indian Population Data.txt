@@ -1,4 +1,4 @@
--- Analyzing the Indian Data with SQL
+-- Analyzing the Indian Population Data with SQL
 
 - checking the datasets
 
